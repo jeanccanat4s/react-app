@@ -1,0 +1,6 @@
+applications:
+  - name: react-app-test
+    memory: 128M
+    buildpacks:
+      - staticfile_buildpack
+    path: dist
