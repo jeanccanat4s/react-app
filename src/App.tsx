@@ -7,7 +7,7 @@ import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
-  const [pacframs] = useSearchParams()
+  const [params] = useSearchParams()
   const idCliente = params.get('idCliente')
 
   return (
