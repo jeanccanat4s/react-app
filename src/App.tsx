@@ -31,7 +31,7 @@ function App() {
           Count is {count}
         </button>
         <p>
-          {idCliente?`idCliente ${idCliente}`:"no se tiene valor de idCliente."}
+          {idCliente?`idCliente ${idCliente}`:"sin valor de parametro idCliente."}
         </p>
       </section>
     </>
