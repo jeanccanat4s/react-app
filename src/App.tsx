@@ -1,42 +1,89 @@
 import { useSearchParams } from 'react-router'
-import { 
-  Title, 
-  Label, 
-  FlexBox, 
-  FlexBoxAlignItems, 
+import {
+  Title,
+  Label,
+  FlexBox,
+  FlexBoxAlignItems,
   Icon,
-  Table,
-  TableHeaderRow,
-  TableHeaderCell,
-  TableRow,
-  TableCell,
   ObjectStatus,
-  IllustratedMessage
+  IllustratedMessage,
+  AnalyticalTable
 } from '@ui5/webcomponents-react'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
 import '@ui5/webcomponents-fiori/dist/illustrations/BeforeSearch.js'
 import '@ui5/webcomponents-icons/dist/customer.js'
 import './App.css'
 
-const mockOrders = [
-  { id: '80001', date: '2026-03-15', status: 'Entregado', total: '$1,200', state: 'Positive' },
-  { id: '80002', date: '2026-03-18', status: 'Pendiente', total: '$850', state: 'Critical' },
-  { id: '80003', date: '2026-03-19', status: 'En camino', total: '$2,100', state: 'Information' },
-];
+const fetchOrders = async (idCliente: string) => {
+  const { data } = await axios.get(`https://69bca9e02bc2a25b22ac0c66.mockapi.io/api-prueba/cliente/${idCliente}/pedidos`)
+  return data
+}
+
+const getStatusState = (status: string) => {
+  switch (status) {
+    case 'Entregado': return 'Positive'
+    case 'Pendiente': return 'Critical'
+    case 'En camino': return 'Information'
+    case 'Cancelado': return 'Negative'
+    default: return 'None'
+  }
+}
+
+const formatDate = (timestamp: number) => {
+  return new Date(timestamp * 1000).toLocaleDateString()
+}
+
+const columns = [
+  {
+    Header: 'ID Pedido',
+    accessor: 'id',
+    width: 100
+  },
+  {
+    Header: 'Fecha',
+    accessor: 'date',
+    Cell: ({ cell: { value } }: any) => <Label>{formatDate(value)}</Label>
+  },
+  {
+    Header: 'Estado',
+    accessor: 'status',
+    Cell: ({ cell: { value } }: any) => (
+      <ObjectStatus state={getStatusState(value) as any}>{value}</ObjectStatus>
+    )
+  },
+  {
+    Header: 'Total',
+    accessor: 'total',
+    Cell: ({ cell: { value } }: any) => <Label>${value}</Label>
+  }
+]
 
 function App() {
   const [params] = useSearchParams()
   const idCliente = params.get('idCliente')
 
+  const { data: orders, isLoading, isError } = useQuery({
+    queryKey: ['orders', idCliente],
+    queryFn: () => fetchOrders(idCliente!),
+    enabled: !!idCliente
+  })
+
   return (
     <div className="mashup-container">
-      {idCliente ? (
+      {!idCliente ? (
+        <IllustratedMessage
+          titleText="Seleccione un Cliente"
+          subtitleText="Vincule un ID de cliente para visualizar la información."
+        />
+      ) : (
         <>
           <div className="info-section">
             <FlexBox alignItems={FlexBoxAlignItems.Center}>
               <Icon name="customer" style={{ marginRight: '8px', color: '#6a6d70' }} />
               <Title level="H5">Información del Cliente</Title>
             </FlexBox>
-            
+
             <FlexBox alignItems={FlexBoxAlignItems.Baseline} style={{ marginTop: '12px' }}>
               <Label showColon>ID de Cliente</Label>
               <span className="id-value">
@@ -47,48 +94,21 @@ function App() {
 
           <div className="table-section">
             <Title level="H5" style={{ marginBottom: '16px' }}>Pedidos Recientes</Title>
-            <Table
-              headerRow={
-                <TableHeaderRow>
-                  <TableHeaderCell>
-                    <Label>ID Pedido</Label>
-                  </TableHeaderCell>
-                  <TableHeaderCell>
-                    <Label>Fecha</Label>
-                  </TableHeaderCell>
-                  <TableHeaderCell>
-                    <Label>Estado</Label>
-                  </TableHeaderCell>
-                  <TableHeaderCell>
-                    <Label>Total</Label>
-                  </TableHeaderCell>
-                </TableHeaderRow>
-              }
-            >
-              {mockOrders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell>
-                    <Label>{order.id}</Label>
-                  </TableCell>
-                  <TableCell>
-                    <Label>{order.date}</Label>
-                  </TableCell>
-                  <TableCell>
-                    <ObjectStatus state={order.state as any}>{order.status}</ObjectStatus>
-                  </TableCell>
-                  <TableCell>
-                    <Label>{order.total}</Label>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </Table>
+
+            {isError ? (
+              <Label>Error al cargar los pedidos.</Label>
+            ) : (
+              <AnalyticalTable
+                data={orders || []}
+                columns={columns}
+                loading={isLoading}
+                minRows={10}
+                visibleRows={orders ? Math.max(orders.length, 10) : 10}
+                noDataText="No se encontraron pedidos"
+              />
+            )}
           </div>
         </>
-      ) : (
-        <IllustratedMessage 
-          titleText="Seleccione un Cliente" 
-          subtitleText="Vincule un ID de cliente para visualizar la información."
-        />
       )}
     </div>
   )
