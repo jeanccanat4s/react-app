@@ -1,18 +1,25 @@
 .mashup-container {
-  padding: 1rem;
+  padding: 0.5rem;
   background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.info-box {
-  padding: 1rem;
-  background-color: #ffffff;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+.info-section, .table-section {
+  padding: 0.5rem 0;
+  background-color: transparent;
+  border: none;
 }
 
 .id-value {
-  margin-left: 8px;
-  font-weight: bold;
-  font-size: 1.1rem;
+  margin-left: 12px;
+  font-weight: 700;
+  font-size: 1.25rem;
   color: #111827;
+}
+
+/* Optimizar apariencia de la tabla */
+ui5-table {
+  border-radius: 4px;
 }

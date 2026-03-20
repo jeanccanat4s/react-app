@@ -1,28 +1,24 @@
 :root {
   --text: #374151;
   --text-h: #111827;
-  --bg: #f9fafb;
-  --accent: #6d28d9;
-  --accent-bg: rgba(109, 40, 217, 0.05);
-  --accent-border: rgba(109, 40, 217, 0.1);
-  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --heading: 'Inter', system-ui, -apple-system, sans-serif;
   
   font-family: var(--heading);
-  background-color: var(--bg);
   color: var(--text);
   margin: 0;
   display: block;
-  min-width: 320px;
 }
 
-/* Forzar tema claro eliminando media query de dark mode */
+/* Forzar transparencia total para integración en iframe */
+html, body, #root {
+  background-color: transparent !important;
+  background: transparent !important;
+  margin: 0;
+  padding: 0;
+  height: auto;
+  min-height: auto;
+}
 
 body {
-  margin: 0;
-  width: 100%;
-}
-
-#root {
   width: 100%;
 }
