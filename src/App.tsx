@@ -7,7 +7,11 @@ import {
   Icon,
   ObjectStatus,
   IllustratedMessage,
-  AnalyticalTable
+  Table,
+  TableHeaderRow,
+  TableHeaderCell,
+  TableRow,
+  TableCell
 } from '@ui5/webcomponents-react'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
@@ -33,31 +37,6 @@ const getStatusState = (status: string) => {
 const formatDate = (timestamp: number) => {
   return new Date(timestamp * 1000).toLocaleDateString()
 }
-
-const columns = [
-  {
-    Header: 'ID Pedido',
-    accessor: 'id',
-    width: 100
-  },
-  {
-    Header: 'Fecha',
-    accessor: 'date',
-    Cell: ({ cell: { value } }: any) => <Label>{formatDate(value)}</Label>
-  },
-  {
-    Header: 'Estado',
-    accessor: 'status',
-    Cell: ({ cell: { value } }: any) => (
-      <ObjectStatus state={getStatusState(value) as any}>{value}</ObjectStatus>
-    )
-  },
-  {
-    Header: 'Total',
-    accessor: 'total',
-    Cell: ({ cell: { value } }: any) => <Label>${value}</Label>
-  }
-]
 
 function App() {
   const [params] = useSearchParams()
@@ -98,14 +77,32 @@ function App() {
             {isError ? (
               <Label>Error al cargar los pedidos.</Label>
             ) : (
-              <AnalyticalTable
-                data={orders || []}
-                columns={columns}
-                loading={isLoading}
-                minRows={10}
-                visibleRows={orders ? Math.max(orders.length, 10) : 10}
+              <Table
                 noDataText="No se encontraron pedidos"
-              />
+                loading={isLoading}
+                alternateRowColors
+                headerRow={
+                  <TableHeaderRow>
+                    <TableHeaderCell>ID Pedido</TableHeaderCell>
+                    <TableHeaderCell>Fecha</TableHeaderCell>
+                    <TableHeaderCell>Estado</TableHeaderCell>
+                    <TableHeaderCell>Total</TableHeaderCell>
+                  </TableHeaderRow>
+                }
+              >
+                {(orders || []).map((order: any) => (
+                  <TableRow key={order.id}>
+                    <TableCell>{order.id}</TableCell>
+                    <TableCell>{formatDate(order.date)}</TableCell>
+                    <TableCell>
+                      <ObjectStatus state={getStatusState(order.status) as any}>
+                        {order.status}
+                      </ObjectStatus>
+                    </TableCell>
+                    <TableCell>${order.total}</TableCell>
+                  </TableRow>
+                ))}
+              </Table>
             )}
           </div>
         </>
